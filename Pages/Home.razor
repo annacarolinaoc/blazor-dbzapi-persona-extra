@@ -1,0 +1,45 @@
+﻿@page "/"
+@inject BlazorDbzApiPersonaExtra.Services.CharacterService CharacterService
+
+<h3>Buscar Personagem - Dragon Ball</h3>
+
+<input type="number" @bind="characterId" placeholder="Digite o ID do personagem" min="1" />
+<button @onclick="BuscarPersonagem">Buscar</button>
+
+@if (character != null)
+{
+    <div style="margin-top:20px;">
+        <img src="@character.Image" alt="@character.Name" style="width:200px; border-radius:10px;" />
+        <p><strong>Nome:</strong> @character.Name</p>
+        <p><strong>Raça:</strong> @character.Race</p>
+    </div>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color:red;">@errorMessage</p>
+}
+
+@code {
+    private int characterId;
+    private BlazorDbzApiPersonaExtra.Models.Character? character;
+    private string? errorMessage;
+
+    private async Task BuscarPersonagem()
+    {
+        errorMessage = null;
+        character = null;
+
+        if (characterId <= 0)
+        {
+            errorMessage = "Digite um ID válido (número maior que zero).";
+            return;
+        }
+
+        character = await CharacterService.GetCharacterAsync(characterId);
+
+        if (character == null)
+        {
+            errorMessage = "Personagem não encontrado!";
+        }
+    }
+}
